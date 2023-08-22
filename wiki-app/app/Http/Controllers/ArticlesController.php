@@ -25,11 +25,9 @@ class ArticlesController extends Controller
         $page = reset($content['query']['pages']);
         if (empty($page['revisions'])){
             $article = 'no article';
-            $words = 'sihs';
         }else{
             $pageUrl = "https://ru.wikipedia.org/wiki/" . $page['title'];
-            $plainText = preg_replace("/'{2,5}(.*?)'{2,5}/", "", $page['revisions'][0]['slots']['main']['*']);
-            $plainText = preg_replace("/[\{\}\(\)\[\]]+/", "", $plainText);
+            $plainText = preg_replace("/'{2,5}(.*?)'{2,5}|[\{\}\(\)\[\]]+/", "", $page['revisions'][0]['slots']['main']['*']);
             $article = Article::firstOrCreate(
                 [
                     'title' => $page['title'],
@@ -37,7 +35,7 @@ class ArticlesController extends Controller
                 [
                     'content' => $plainText,
                     'url' => $pageUrl,
-                    'size_article' => (string)$page['revisions'][0]['size'],
+                    'size_article' => $page['revisions'][0]['size'],
                     'word_count' => count(preg_split('/[^а-яА-Я]+/u', $plainText, -1, PREG_SPLIT_NO_EMPTY)),
                 ]
             );

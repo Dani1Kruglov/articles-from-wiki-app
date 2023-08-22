@@ -28,7 +28,8 @@ class ArticlesController extends Controller
             $words = 'sihs';
         }else{
             $pageUrl = "https://ru.wikipedia.org/wiki/" . $page['title'];
-            $plainText = $this->convertMediaWikiToPlainText($page['revisions'][0]['slots']['main']['*']);
+            $plainText = preg_replace("/'{2,5}(.*?)'{2,5}/", "", $page['revisions'][0]['slots']['main']['*']);
+            $plainText = preg_replace("/[\{\}\(\)\[\]]+/", "", $plainText);
             $article = Article::firstOrCreate(
                 [
                     'title' => $page['title'],
@@ -59,12 +60,6 @@ class ArticlesController extends Controller
         return response()->json(['articles' => $articles]);
     }
 
-    private function convertMediaWikiToPlainText($content)
-    {
-        $plainText = preg_replace("/'{2,5}(.*?)'{2,5}/", "$1", $content);
-        $plainText = preg_replace("/\[\[.*?\|(.+?)\]\]/", "$1", $plainText);
-        return $plainText;
-    }
 
     private function setWordsOfArticle( string $content, int $articleId)
     {

@@ -48,14 +48,46 @@
 
             <div class="tab-pane fade mt-3" id="searchTab">
                 <h3>Поиск статей</h3>
+                <a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+                    Link with href
+                </a>
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+                    Button with data-bs-target
+                </button>
+
+                <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <div>
+                            Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
+                        </div>
+                        <div class="dropdown mt-3">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Dropdown button
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <div class="mb-3 w-50">
                     <label for="word" class="form-label">Поиск статей по слову</label>
                     <input type="text" class="form-control" id="word" name="word">
                     <div id="emailHelp" class="form-text">Введите слово статьи</div>
                 </div>
                 <button type="submit" id="search-button" class="btn btn-primary">Найти</button>
-                <ul class="list-group" id="articles-list" style="margin-top: 50px"></ul>
-                <div id="content-container" style="background: darkgray"></div>
+                <div style="display: flex;">
+                    <ul class="list-group" id="articles-list" style="margin-top: 50px; flex: 1;"></ul>
+                    <div class="scrollable-container" style="width: 50%; height: 70%;overflow: hidden;background-color: #ccc; ">
+                        <div class="scrollable-content" style=" padding: 10px; overflow-y: scroll; height: 100%;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -116,11 +148,28 @@
                     success: function(response) {
                         var articles = response.articles;
                         var articleList = document.getElementById('articles-list');
+                        var scrollableContent = document.querySelector('.scrollable-content');
                         articleList.innerHTML = '';
+                        function showContent(content) {
+                            scrollableContent.innerHTML = content;
+                        }
                         articles.forEach(function(article) {
                             var listItem = document.createElement('li');
                             listItem.className = 'list-group-item';
-                            listItem.innerHTML = '<a href="'+article.url+'" >' + article.title + '</a href="" ><span style="color: grey; margin-left: 10%">(' + article.number_of_words  + ' вхождений)</span>';
+
+                            var titleLink = document.createElement('a');
+                            titleLink.href = article.url;
+                            titleLink.textContent = article.title;
+
+                            var contentButton = document.createElement('button');
+                            contentButton.textContent = 'Показать содержание';
+                            contentButton.className = 'btn btn-primary btn-sm';
+                            contentButton.addEventListener('click', function() {
+                                showContent(article.content);
+                            });
+
+                            listItem.appendChild(titleLink);
+                            listItem.appendChild(contentButton);
                             articleList.appendChild(listItem);
                         });
                     },
